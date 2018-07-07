@@ -4,6 +4,7 @@ import "time"
 
 func KafkaProducer(host string)  {
 	for {
-		time.Sleep(1)
+		println("Kafka Producer Sleeping for 5 seconds")
+		time.Sleep(5 * 1000000000 )
 	}
 }

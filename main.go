@@ -6,6 +6,7 @@ import (
 	"playground/functions"
 	"playground/producers"
 	"playground/consumers"
+	"gopkg.in/linkedin/goavro"
 )
 
 
