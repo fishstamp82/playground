@@ -6,12 +6,11 @@ import (
 	"playground/functions"
 	"playground/producers"
 	"playground/consumers"
-	"gopkg.in/linkedin/goavro"
 )
 
 
 func main() {
-	channel := make(chan int)
+	channel := make(chan int, 5)
 	go functions.Printer(channel)
 	go producers.KafkaProducer( "localhost" )
 	go consumers.KafkaConsumer( "localhost" )
