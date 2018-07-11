@@ -2,28 +2,26 @@ package main
 
 import (
 	"net/http"
-	"github.com/julienschmidt/httprouter"
 	"playground/functions"
-	"runtime"
 	"playground/producers"
-	"playground/consumers"
+	"github.com/julienschmidt/httprouter"
 )
 
-
 func main() {
-	runtime.GOMAXPROCS(1)
-	channel := make(chan int, 4)
-	channel_to_kafka_producer := make(chan []byte)
 
-	go functions.Printer(channel)
-	go producers.KafkaProducer( channel_to_kafka_producer )
-	go consumers.KafkaConsumer( "localhost" )
-
+	channelToKafkaProducer := make(chan int, 250)
 
 	router := httprouter.New()
-	router.GET("/listen/:digit", functions.CreateListener(channel))
-	router.GET("/kafka/:digit", functions.CreateKafkaProducerListener(channel))
 
+	
+	router.GET("/publish/:bucket_id", functions.CreateBucketListener(channelToKafkaProducer))
+	go producers.KafkaProducer(channelToKafkaProducer)
+
+	// go consumers.KafkaConsumer("localhost")
+
+	// router.GET("//:digit", functions.CreateKafkaProducerListener(channel))
+	
+	println("Running server on localhost:8080")
 	if err := http.ListenAndServe(":8080", router); err != nil {
 		panic(err)
 	}

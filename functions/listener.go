@@ -1,40 +1,31 @@
 package functions
 
 import (
-	"github.com/julienschmidt/httprouter"
-	"net/http"
-	"strconv"
 	"fmt"
-	"os"
 	"io"
+	"net/http"
+	"os"
+	"strconv"
+
+	"github.com/julienschmidt/httprouter"
 )
 
-func CreateListener(c chan<- int) httprouter.Handle {
+// CreateBucketListener is designed to
+func CreateBucketListener(channelToKafkaProducer chan<- int) httprouter.Handle {
 
 	return func(w http.ResponseWriter, r *http.Request, d httprouter.Params) {
-		val, err := strconv.Atoi(d.ByName("digit"))
+
+		strDigit := d.ByName("bucket_id")
+		intDigit, err := strconv.Atoi(strDigit)
 		if err != nil {
 			// handle error
 			fmt.Println(err)
 			os.Exit(2)
 		}
- 		c <- val
-		io.WriteString(w, "hello, world!\n")
+
+		io.WriteString(w, fmt.Sprintf("Sending bucket_id %d to kafka producer", intDigit))
+		channelToKafkaProducer <- intDigit
+
+		
 	}
 }
-
-func CreateKafkaProducerListener(c chan<- []byte) httprouter.Handle {
-
-	return func(w http.ResponseWriter, r *http.Request, d httprouter.Params) {
-		val, err := strconv.Atoi(d.ByName("digit"))
-		if err != nil {
-			// handle error
-			fmt.Println(err)
-			os.Exit(2)
-		}
-		c <- []byte(val) 
-		io.WriteString(w, "Sent Message to kafka!\n")
-	}
-}
-
-
