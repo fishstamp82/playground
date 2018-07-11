@@ -10,18 +10,13 @@ import (
 func main() {
 
 	channelToKafkaProducer := make(chan int, 250)
-
 	router := httprouter.New()
 
-	
 	router.GET("/publish/:bucket_id", functions.CreateBucketListener(channelToKafkaProducer))
 	go producers.KafkaProducer(channelToKafkaProducer)
 
-	// go consumers.KafkaConsumer("localhost")
-
-	// router.GET("//:digit", functions.CreateKafkaProducerListener(channel))
-	
 	println("Running server on localhost:8080")
+
 	if err := http.ListenAndServe(":8080", router); err != nil {
 		panic(err)
 	}
